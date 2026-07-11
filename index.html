@@ -470,6 +470,13 @@ const MESSAGES = {
       `Customer> ${n}\nEco ID : ${e}\nLP : ${l}\nCategory : ${c}\nTest Type : ${t}\nis waiting to get Payment clearance, Please request to give this clearance as customer waitng to book the test.`
   },
 
+   "Pre-Ev Skip": {
+    needsLP: true,
+    activeWhen: 'has-lp',
+    build: (n, e, l, c, t) =>
+      `Customer> ${n}\nEco ID : ${e}\nLP : ${l}\nCategory : ${c}\nDear Team - in this customer file, in ECO-system Shwoing Pre-evaluation Test, please make this test Skip to book next classes/tests.`
+  },
+
   "C.T.S Failed": {
     needsLP: true,
     activeWhen: 'has-lp',
