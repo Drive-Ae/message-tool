@@ -680,7 +680,7 @@ function resetFields() {
   document.getElementById('test-type-wrap').style.display = 'none';
   document.querySelectorAll('.test-type-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.cmd').forEach(b => b.classList.remove('active'));
-  currentComplaint = code;
+  currentComplaint = '';
   const out = document.getElementById('out');
   out.textContent = 'Your message will appear here after you click a command button above.';
   out.classList.add('empty');
