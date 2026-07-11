@@ -302,6 +302,15 @@
 </head>
 <body>
 
+<!-- WELCOME BAR -->
+<div id="welcome-bar" style="display:none; background:#1A2E45; border-bottom:0.5px solid #2C4A6E; padding:10px 24px; font-family:'Segoe UI',sans-serif; display:none;">
+  <span style="color:#6B8099; font-size:13px;">Welcome </span>
+  <span id="welcome-name" style="color:#E8A020; font-size:13px; font-weight:600;"></span>
+  <span style="color:#6B8099; font-size:13px;"> &nbsp;|&nbsp; Today: </span>
+  <span id="welcome-count" style="color:#2ECC71; font-size:13px; font-weight:600;">0</span>
+  <span style="color:#6B8099; font-size:13px;"> complaints</span>
+</div>
+  
 <!-- LOGIN SCREEN -->
 <div id="login-screen">
   <div class="login-box">
@@ -530,6 +539,7 @@ const MESSAGES = {
 //  DO NOT EDIT BELOW THIS LINE
 // =============================================================
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyOleZqMJ60kjE694orJR4ThwJD4dGoaNzETdCXFq0DTHaqQq2Kofs-xolb14Jtn8P97A/exec';
+let todayCount = 0;
 let currentMsg = '';
 let loggedInUser = '';
 let currentComplaint = '';
@@ -778,13 +788,14 @@ function copyMsg() {
     btn.textContent = 'Copied! Go to WhatsApp and press CTRL+V';
     setTimeout(() => btn.textContent = 'Click here to Copy message For WhatsApp - Paste with CTRL+V', 3000);
 
-    // Send data silently to Google Sheet
+   // Send data silently to Google Sheet
     const dt = getDateTime();
     fetch(SHEET_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
+        action    : 'log',
         agent     : loggedInUser,
         customer  : document.getElementById('name').value.trim(),
         eco       : document.getElementById('eco').value.trim(),
@@ -793,8 +804,9 @@ function copyMsg() {
         date      : dt.date
       })
     });
-  });
-}
+    // Update counter on page
+    todayCount++;
+    document.getElementById('welcome-count').textContent = todayCount;
 
 // All buttons disabled on load
 Object.keys(MESSAGES).forEach(code => {
@@ -816,7 +828,15 @@ const USERS = {
   "Atif.e" : "eco1234",
   "Hassan.a" : "eco123456",
 };
-
+function fetchCount(agent) {
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode:   'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'getCount', agent: agent })
+  });
+}
+  
 function doLogin() {
   const user = document.getElementById('login-user').value.trim();
   const pass = document.getElementById('login-pass').value.trim();
@@ -827,6 +847,10 @@ function doLogin() {
     loggedInUser = user;
     document.title = 'Complain Message Generator';
     err.style.display = 'none';
+    // Show welcome bar and fetch count
+    document.getElementById('welcome-name').textContent  = user;
+    document.getElementById('welcome-bar').style.display = 'block';
+    fetchCount(user);
   } else {
     err.style.display = 'block';
     document.getElementById('login-pass').value = '';
