@@ -728,6 +728,7 @@ function generate(code, btn) {
 
   document.querySelectorAll('.cmd').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  currentComplaint = code;
 
   const dt = getDateTime();
   currentMsg = cfg.build(name, eco, lp, cat, test)
