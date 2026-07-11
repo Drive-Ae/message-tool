@@ -808,6 +808,8 @@ function copyMsg() {
     // Update counter on page
     todayCount++;
     document.getElementById('welcome-count').textContent = todayCount;
+    localStorage.setItem('count_' + loggedInUser, todayCount);
+    localStorage.setItem('count_date_' + loggedInUser, new Date().toLocaleDateString('en-GB'));
   });
 }
 
@@ -832,21 +834,18 @@ const USERS = {
   "Hassan.a" : "eco123456",
 };
 function fetchCount(agent) {
-  fetch(SHEET_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ action: 'getCount', agent: agent })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.result === 'success') {
-      todayCount = data.count;
-      document.getElementById('welcome-count').textContent = todayCount;
-    }
-  })
-  .catch(() => {
+  const today    = new Date().toLocaleDateString('en-GB');
+  const savedDay = localStorage.getItem('count_date_' + agent);
+  const saved    = parseInt(localStorage.getItem('count_' + agent)) || 0;
+
+  if (savedDay === today) {
+    todayCount = saved;
+  } else {
     todayCount = 0;
-  });
+    localStorage.setItem('count_date_' + agent, today);
+    localStorage.setItem('count_' + agent, '0');
+  }
+  document.getElementById('welcome-count').textContent = todayCount;
 }
   
 function doLogin() {
