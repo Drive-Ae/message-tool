@@ -729,6 +729,9 @@ function generate(code, btn) {
   const wrap = document.getElementById('test-type-wrap');
   if (code === 'Payment Clearance') {
     wrap.style.display = 'block';
+    document.querySelectorAll('.cmd').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentComplaint = code;
     if (!test) { return; } // wait silently for sub-button click
   } else {
     wrap.style.display = 'none';
