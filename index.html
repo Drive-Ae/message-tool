@@ -515,8 +515,10 @@ const MESSAGES = {
 // =============================================================
 //  DO NOT EDIT BELOW THIS LINE
 // =============================================================
-
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyOleZqMJ60kjE694orJR4ThwJD4dGoaNzETdCXFq0DTHaqQq2Kofs-xolb14Jtn8P97A/exec';
 let currentMsg = '';
+let loggedInUser = '';
+let currentComplaint = '';
 
 // Build buttons
 const container = document.getElementById('btn-container');
@@ -678,6 +680,7 @@ function resetFields() {
   document.getElementById('test-type-wrap').style.display = 'none';
   document.querySelectorAll('.test-type-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.cmd').forEach(b => b.classList.remove('active'));
+  currentComplaint = code;
   const out = document.getElementById('out');
   out.textContent = 'Your message will appear here after you click a command button above.';
   out.classList.add('empty');
@@ -751,11 +754,27 @@ function showErr(msg) {
 }
 
 function copyMsg() {
-  if (!currentMsg) { showErr('To complete the request paste the customer info in step 1-!'); return; }
+  if (!currentMsg) { showErr('Generate a message first!'); return; }
   navigator.clipboard.writeText(currentMsg).then(() => {
     const btn = document.querySelector('.copy-btn');
     btn.textContent = 'Copied! Go to WhatsApp and press CTRL+V';
-    setTimeout(() => btn.textContent = 'Copy message — Paste into WhatsApp with CTRL+V', 3000);
+    setTimeout(() => btn.textContent = 'Click here to Copy message For WhatsApp - Paste with CTRL+V', 3000);
+
+    // Send data silently to Google Sheet
+    const dt = getDateTime();
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agent     : loggedInUser,
+        customer  : document.getElementById('name').value.trim(),
+        eco       : document.getElementById('eco').value.trim(),
+        lp        : document.getElementById('lp').value.trim() || '—',
+        complaint : currentComplaint,
+        date      : dt.date
+      })
+    });
   });
 }
 
@@ -786,6 +805,7 @@ function doLogin() {
 
   if (USERS[user] && USERS[user] === pass) {
     document.getElementById('login-screen').style.display = 'none';
+    loggedInUser = user;
     document.title = 'Complain Message Generator';
     err.style.display = 'none';
   } else {
