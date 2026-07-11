@@ -834,9 +834,18 @@ const USERS = {
 function fetchCount(agent) {
   fetch(SHEET_URL, {
     method: 'POST',
-    mode:   'no-cors',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ action: 'getCount', agent: agent })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.result === 'success') {
+      todayCount = data.count;
+      document.getElementById('welcome-count').textContent = todayCount;
+    }
+  })
+  .catch(() => {
+    todayCount = 0;
   });
 }
   
