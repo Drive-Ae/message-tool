@@ -323,7 +323,11 @@
     </div>
     <div class="login-field">
       <label>Password</label>
-      <input type="password" id="login-pass" placeholder="••••••••" />
+     <div style="position:relative;">
+  <input type="password" id="login-pass" placeholder="••••••••" style="width:100%;padding:10px 40px 10px 14px;border:0.5px solid #2C4A6E;border-radius:8px;font-size:14px;background:#0D1B2A;color:#F4F1ED;font-family:'Segoe UI',sans-serif;" />
+  <span onclick="togglePass()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;user-select:none;" id="eye-icon">👁️</span>
+</div>
+      
     </div>
     <button class="login-btn" onclick="doLogin()">Login</button>
     <div class="login-err" id="login-err">Incorrect username or password.</div>
@@ -912,7 +916,17 @@ function fetchCount(agent) {
   }
   document.getElementById('welcome-count').textContent = todayCount;
 }
-  
+function togglePass() {
+  const input = document.getElementById('login-pass');
+  const icon  = document.getElementById('eye-icon');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    icon.textContent = '👁️';
+  }
+}  
 function doLogin() {
   const user = document.getElementById('login-user').value.trim();
   const pass = document.getElementById('login-pass').value.trim();
