@@ -832,13 +832,7 @@ function selectTestType(type, btn) {
   if (payBtn) generate('Payment Clearance', payBtn);
 }
 
-  locWrap.style.display = 'none';
-  // Auto-generate for non-LMV or Final Road Test
-  const payBtn = document.getElementById('btn-Payment-Clearance');
-  if (payBtn) generate('Payment Clearance', payBtn);
-}
-
-  function selectLocation(loc, btn) {
+function selectLocation(loc, btn) {
   document.querySelectorAll('#location-wrap .test-type-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('selected-location').value = loc;
