@@ -488,11 +488,11 @@ const MESSAGES = {
     activeWhen: 'has-lp',
     build: (n, e, l, c, t, loc) => {
       // LMV with location
-      if (c === 'LMV' && loc && t === 'Theory Test') {
+      if (c.startsWith('LMV') && loc && t === 'Theory Test') {
         const center = loc === 'Al Quoz' ? 'Eco Drive Al Quoz Center' : 'Eco Drive DIC Head office';
         return `Customer> ${n}\nEco ID : ${e}\nLP : ${l}\nCategory : ${c}\nStudent has done the Mock test and waiting to get RTA Theory test Payment clearance to book his Test in *${center}*`;
       }
-      if (c === 'LMV' && loc && t === 'Yard / Parking Test') {
+      if (c.startsWith('LMV') && loc && t === 'Yard / Parking Test') {
         const center = loc === 'Al Quoz' ? 'Eco Drive Al Quoz Center' : 'Eco Drive DIC Head office';
         return `Customer> ${n}\nEco ID : ${e}\nLP : ${l}\nCategory : ${c}\nStudent has done the Parking Training and waiting to get RTA Parking test Payment clearance to book his Test in *${center}*`;
       }
