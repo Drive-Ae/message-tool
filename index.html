@@ -399,13 +399,23 @@ Current Stage
     <!-- Test type sub-buttons for Payment Clearance -->
     <div id="test-type-wrap" style="display:none; margin-top:12px; padding-top:12px; border-top:0.5px solid var(--border);">
       <p style="font-size:11px;color:var(--muted);font-weight:500;margin-bottom:8px;">SELECT TEST TYPE</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;" id="sub-btn-row">
         <button class="test-type-btn" onclick="selectTestType('Theory Test', this)">Theory Test</button>
         <button class="test-type-btn" onclick="selectTestType('Yard / Parking Test', this)">Yard / Parking Test</button>
         <button class="test-type-btn" onclick="selectTestType('Final Road Test', this)">Final Road Test</button>
       </div>
+
+      <!-- Sub-sub buttons — location selection for LMV only -->
+      <div id="location-wrap" style="display:none; margin-top:10px; padding-top:10px; border-top:0.5px dashed var(--border);">
+        <p style="font-size:11px;color:var(--muted);font-weight:500;margin-bottom:8px;">SELECT LOCATION</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="test-type-btn" onclick="selectLocation('Al Quoz', this)">Al Quoz</button>
+          <button class="test-type-btn" onclick="selectLocation('DIC', this)">DIC</button>
+        </div>
+      </div>
     </div>
     <input type="hidden" id="selected-test-type" />
+    <input type="hidden" id="selected-location" />
 
     <p class="lp-note" id="lp-note"></p>
   </div>
@@ -476,11 +486,21 @@ const MESSAGES = {
    "Payment Clearance": {
     needsLP: true,
     activeWhen: 'has-lp',
-    build: (n, e, l, c, t) => {
+    build: (n, e, l, c, t, loc) => {
+      // LMV with location
+      if (c === 'LMV' && loc && t === 'Theory Test') {
+        const center = loc === 'Al Quoz' ? 'Eco Drive Al Quoz Center' : 'Eco Drive DIC Head office';
+        return `Customer> ${n}\nEco ID : ${e}\nLP : ${l}\nCategory : ${c}\nStudent has done the Mock test and waiting to get RTA Theory test Payment clearance to book his Test in *${center}*`;
+      }
+      if (c === 'LMV' && loc && t === 'Yard / Parking Test') {
+        const center = loc === 'Al Quoz' ? 'Eco Drive Al Quoz Center' : 'Eco Drive DIC Head office';
+        return `Customer> ${n}\nEco ID : ${e}\nLP : ${l}\nCategory : ${c}\nStudent has done the Parking Training and waiting to get RTA Parking test Payment clearance to book his Test in *${center}*`;
+      }
+      // Non-LMV or Final Road Test
       const messages = {
-        'Theory Test'       : 'Student has done the Mock test and waiting to get RTA Theory test Payment clearance so that he can proceed with the RTA Theory test booking.',
-        'Yard / Parking Test' : 'Student has done Parking training, waiting to get RTA Parking test Payment clearance, so that he can proceed with the RTA test booking.',
-        'Final Road Test'   : 'Student has done Road training, waiting to get RTA Road test Payment Clearance proceed with the RTA test booking.',
+        'Theory Test'         : 'Student has done the Mock test and waiting to get RTA Theory test payment clearance so that he can proceed with the RTA Theory test booking.',
+        'Yard / Parking Test' : 'Student has done Parking training, waiting to get RTA Parking/yard test payment clearance so that he can proceed with the RTA test booking.',
+        'Final Road Test'     : 'Student has done Parking training, waiting to get RTA Road test payment clearance so that he can proceed with the RTA test booking.',
       };
       const testMsg = messages[t] || 'is waiting to get Payment clearance.';
       return `Customer> ${n}\nEco ID : ${e}\nLP : ${l}\nCategory : ${c}\n${testMsg}`;
@@ -701,8 +721,10 @@ function resetFields() {
     const badge = document.getElementById(id + '-badge');
     if (badge) badge.textContent = '—';
   });
-  document.getElementById('selected-test-type').value = '';
-  document.getElementById('test-type-wrap').style.display = 'none';
+ document.getElementById('selected-test-type').value = '';
+  document.getElementById('selected-location').value  = '';
+  document.getElementById('test-type-wrap').style.display  = 'none';
+  document.getElementById('location-wrap').style.display   = 'none';
   document.querySelectorAll('.test-type-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.cmd').forEach(b => b.classList.remove('active'));
   currentComplaint = '';
@@ -756,10 +778,19 @@ function generate(code, btn) {
 
   document.querySelectorAll('.cmd').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  currentComplaint = code;
+  const selTest = document.getElementById('selected-test-type').value.trim();
+  const selLoc  = document.getElementById('selected-location').value.trim();
+  if (selTest && selLoc) {
+    currentComplaint = code + ' - ' + selTest + ' - ' + selLoc;
+  } else if (selTest) {
+    currentComplaint = code + ' - ' + selTest;
+  } else {
+    currentComplaint = code;
+  }
 
   const dt = getDateTime();
-  currentMsg = cfg.build(name, eco, lp, cat, test)
+  const loc  = document.getElementById('selected-location').value.trim();
+  currentMsg = cfg.build(name, eco, lp, cat, test, loc)
     + `\n\nDate of request : ${dt.date}\nTime : ${dt.time}.`;
 
   const out = document.getElementById('out');
@@ -771,11 +802,35 @@ function selectTestType(type, btn) {
   document.querySelectorAll('.test-type-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('selected-test-type').value = type;
-  // Auto-generate once test type selected
+  document.getElementById('selected-location').value  = '';
+
+  // Show location buttons only for LMV + Theory or Yard test
+  const cat      = document.getElementById('cat').value.trim();
+  const locWrap  = document.getElementById('location-wrap');
+  const needsLoc = cat === 'LMV' && (type === 'Theory Test' || type === 'Yard / Parking Test');
+
+  if (needsLoc) {
+    locWrap.style.display = 'block';
+    document.querySelectorAll('#location-wrap .test-type-btn').forEach(b => b.classList.remove('active'));
+    // Wait for location selection — don't generate yet
+    return;
+  }
+
+  locWrap.style.display = 'none';
+  // Auto-generate for non-LMV or Final Road Test
   const payBtn = document.getElementById('btn-Payment-Clearance');
   if (payBtn) generate('Payment Clearance', payBtn);
 }
 
+  function selectLocation(loc, btn) {
+  document.querySelectorAll('#location-wrap .test-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('selected-location').value = loc;
+  // Now generate message with location
+  const payBtn = document.getElementById('btn-Payment-Clearance');
+  if (payBtn) generate('Payment Clearance', payBtn);
+}
+  
 function showErr(msg) {
   const err = document.getElementById('err');
   err.textContent = msg;
