@@ -430,7 +430,7 @@ Current Stage
     <div class="output-area empty" id="out">
       Your message will appear here after you click a command button above.
     </div>
-    <button class="copy-btn" onclick="copyMsg()">Click here to Copy message For WhatsApp - Paste with CTRL+V</button>
+    <button class="copy-btn" onclick="copyMsg()">CLICK HERE TO COPY MESSAGE FOR WHATSAPP</button>
   </div>
 
   <p class="footer">For Support Contact 0585207237.</p>
@@ -856,7 +856,7 @@ function copyMsg() {
   navigator.clipboard.writeText(currentMsg).then(() => {
     const btn = document.querySelector('.copy-btn');
     btn.textContent = 'Copied! Go to WhatsApp and press CTRL+V';
-    setTimeout(() => btn.textContent = 'Click here to Copy message For WhatsApp - Paste with CTRL+V', 3000);
+    setTimeout(() => btn.textContent = 'CLICK HERE TO COPY MESSAGE FOR WHATSAPP', 10000);
 
    // Send data silently to Google Sheet
     const dt = getDateTime();
