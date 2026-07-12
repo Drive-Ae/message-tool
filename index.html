@@ -762,13 +762,21 @@ function generate(code, btn) {
   const wrap = document.getElementById('test-type-wrap');
   if (code === 'Payment Clearance') {
     wrap.style.display = 'block';
+    document.getElementById('location-wrap').style.display = 'none'; // hide location until test type selected
     document.querySelectorAll('.cmd').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentComplaint = code;
-    if (!test) { return; } // wait silently for sub-button click
+    if (!test) { return; } // wait for test type click
+    // If test needs location and none selected yet — wait
+    const cat      = document.getElementById('cat').value.trim();
+    const loc      = document.getElementById('selected-location').value.trim();
+    const needsLoc = cat.startsWith('LMV') && (test === 'Theory Test' || test === 'Yard / Parking Test');
+    if (needsLoc && !loc) { return; } // wait for location click
   } else {
     wrap.style.display = 'none';
+    document.getElementById('location-wrap').style.display = 'none';
     document.getElementById('selected-test-type').value = '';
+    document.getElementById('selected-location').value  = '';
     document.querySelectorAll('.test-type-btn').forEach(b => b.classList.remove('active'));
   }
 
@@ -799,22 +807,30 @@ function generate(code, btn) {
 }
 
 function selectTestType(type, btn) {
-  document.querySelectorAll('.test-type-btn').forEach(b => b.classList.remove('active'));
+  // Reset only sub-buttons, not location buttons
+  document.querySelectorAll('#sub-btn-row .test-type-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('selected-test-type').value = type;
   document.getElementById('selected-location').value  = '';
 
-  // Show location buttons only for LMV + Theory or Yard test
-  const cat      = document.getElementById('cat').value.trim();
-  const locWrap  = document.getElementById('location-wrap');
-  const needsLoc = cat.startsWith('LMV') && (type === 'Theory Test' || type === 'Yard / Parking Test');
+  const cat     = document.getElementById('cat').value.trim();
+  const locWrap = document.getElementById('location-wrap');
 
+  // Hide location first
+  locWrap.style.display = 'none';
+  document.querySelectorAll('#location-wrap .test-type-btn').forEach(b => b.classList.remove('active'));
+
+  // Show location only for LMV + Theory or Yard
+  const needsLoc = cat.startsWith('LMV') && (type === 'Theory Test' || type === 'Yard / Parking Test');
   if (needsLoc) {
     locWrap.style.display = 'block';
-    document.querySelectorAll('#location-wrap .test-type-btn').forEach(b => b.classList.remove('active'));
-    // Wait for location selection — don't generate yet
-    return;
+    return; // Wait for location click — don't generate yet
   }
+
+  // For all other types generate immediately
+  const payBtn = document.getElementById('btn-Payment-Clearance');
+  if (payBtn) generate('Payment Clearance', payBtn);
+}
 
   locWrap.style.display = 'none';
   // Auto-generate for non-LMV or Final Road Test
