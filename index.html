@@ -807,7 +807,7 @@ function selectTestType(type, btn) {
   // Show location buttons only for LMV + Theory or Yard test
   const cat      = document.getElementById('cat').value.trim();
   const locWrap  = document.getElementById('location-wrap');
-  const needsLoc = cat === 'LMV' && (type === 'Theory Test' || type === 'Yard / Parking Test');
+  const needsLoc = cat.startsWith('LMV') && (type === 'Theory Test' || type === 'Yard / Parking Test');
 
   if (needsLoc) {
     locWrap.style.display = 'block';
