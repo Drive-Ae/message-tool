@@ -480,6 +480,13 @@ const MESSAGES = {
       `Customer> ${n}\nEco ID : ${e}\nCategory : ${c}\nis waiting to get Learning Permit. Please check with customer, call and update them.`
   },
 
+  "Lec Update": {
+    needsLP: true,
+    activeWhen: 'has-lp',
+    build: (n, e, l, c, t) =>
+      `Customer> ${n}\nEco ID : ${e}\nLP : ${l}\nCategory : ${c}\nPlease update the Lecutures as customer completed the theory training, but not reflecting in RTA profile. Customer need to book theory test`
+  },
+
   "Theory Test": {
     needsLP: true,
     activeWhen: 'has-lp',
