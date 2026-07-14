@@ -298,6 +298,78 @@
   .test-type-btn:hover  { border-color: var(--gold); color: var(--gold); }
   .test-type-btn.active { background: var(--gold-bg); border-color: var(--gold); color: var(--gold); }
 
+  /* ── ID Scanner ── */
+  .open-scanner-btn {
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--gold);
+    background: var(--gold-bg);
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Segoe UI', sans-serif;
+    transition: opacity 0.15s;
+  }
+  .open-scanner-btn:hover { opacity: 0.85; }
+  #scan-pasteZone {
+    margin-top: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 0.5px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-size: 13px;
+    cursor: text;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  #scan-pasteZone:focus { outline: none; border-color: var(--gold); background: var(--gold-bg); }
+  #scan-preview {
+    display: none;
+    max-width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border);
+    margin-top: 12px;
+  }
+  #scan-rotateControls {
+    display: none;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .scan-field { margin-bottom: 12px; }
+  .scan-field label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px; font-weight: 500; }
+  .scan-field input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .scan-field input:focus { outline: none; border-color: var(--gold); }
+  #scan-summaryBox {
+    width: 100%;
+    padding: 10px 12px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Segoe UI', sans-serif;
+    resize: none;
+    line-height: 1.6;
+  }
+  #scan-status { font-size: 12px; color: var(--muted); margin-top: 8px; min-height: 16px; }
+  #scan-copyStatus { margin-left: 10px; font-size: 13px; color: var(--green-t); }
+
 </style>
 </head>
 <body>
@@ -335,11 +407,12 @@
   </div>
 </div>
 
-<div class="wrapper">
+<div class="wrapper" id="main-wrapper">
 
   <div class="header">
     <h1>ECO Smart Complain System DIC Team</h1>
     <p>Paste customer info → Extract → Click a command button → Copy to WhatsApp.</p>
+    <button type="button" class="open-scanner-btn" id="open-scanner-btn">🪪 Open ID Scanner</button>
   </div>
 
   <!-- Step 1 -->
@@ -435,6 +508,65 @@ Current Stage
 
   <p class="footer">For Support Contact 0585207237.</p>
 </div>
+
+<!-- ID SCANNER VIEW -->
+<div class="wrapper" id="scan-view" style="display:none;">
+
+  <div class="header">
+    <button type="button" class="clear-btn" id="scan-back-btn" style="margin-bottom:12px;">← Back to Message Tool</button>
+    <h1>ID Card Scanner</h1>
+    <p>Upload or paste a screenshot of an Emirates ID to extract the details.</p>
+  </div>
+
+  <div class="card">
+    <p class="section-label">Step 1 — Provide the ID image</p>
+    <input type="file" id="scan-imageInput" accept="image/*">
+    <div id="scan-pasteZone" tabindex="0">
+      Click here, then press <strong>Ctrl+V</strong> (or Cmd+V) to paste a screenshot
+    </div>
+    <img id="scan-preview" alt="ID preview">
+    <div id="scan-rotateControls">
+      <button type="button" class="test-type-btn" id="scan-rotateLeftBtn">⟲ Rotate Left</button>
+      <button type="button" class="test-type-btn" id="scan-rotateRightBtn">⟳ Rotate Right</button>
+    </div>
+    <div class="btn-row">
+      <button class="extract-btn" id="scan-scanBtn">Scan ID Card</button>
+    </div>
+    <p id="scan-status"></p>
+  </div>
+
+  <div class="card">
+    <p class="section-label">Step 2 — Extracted details</p>
+    <div class="scan-field">
+      <label>Name</label>
+      <input type="text" id="scan-name">
+    </div>
+    <div class="grid">
+      <div class="scan-field">
+        <label>ID Number</label>
+        <input type="text" id="scan-idNumber">
+      </div>
+      <div class="scan-field">
+        <label>Date of Birth</label>
+        <input type="text" id="scan-dob">
+      </div>
+    </div>
+    <div class="scan-field">
+      <label>Expiry Date</label>
+      <input type="text" id="scan-expiry">
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="section-label">Step 3 — Copy all</p>
+    <textarea id="scan-summaryBox" rows="5" readonly></textarea>
+    <button class="copy-btn" id="scan-copyBtn" style="margin-top:10px;">Copy All</button>
+    <span id="scan-copyStatus"></span>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
 
 <script>
 
@@ -963,5 +1095,367 @@ document.getElementById('login-user').addEventListener('keydown', function(e) {
 });
 
 </script>
+
+<!-- ============================================================= -->
+<!-- ID SCANNER SCRIPT (self-contained, does not touch Message Tool -->
+<!-- variables or functions above)                                  -->
+<!-- ============================================================= -->
+<script>
+(function () {
+  const imageInput = document.getElementById('scan-imageInput');
+  const pasteZone = document.getElementById('scan-pasteZone');
+  const scanBtn = document.getElementById('scan-scanBtn');
+  const preview = document.getElementById('scan-preview');
+  const statusEl = document.getElementById('scan-status');
+  const rotateControls = document.getElementById('scan-rotateControls');
+  const rotateLeftBtn = document.getElementById('scan-rotateLeftBtn');
+  const rotateRightBtn = document.getElementById('scan-rotateRightBtn');
+
+  const nameEl = document.getElementById('scan-name');
+  const idNumberEl = document.getElementById('scan-idNumber');
+  const dobEl = document.getElementById('scan-dob');
+  const expiryEl = document.getElementById('scan-expiry');
+
+  const summaryBox = document.getElementById('scan-summaryBox');
+  const copyBtn = document.getElementById('scan-copyBtn');
+  const copyStatus = document.getElementById('scan-copyStatus');
+
+  let selectedFile = null;
+  let rotation = 0; // 0, 90, 180, 270 degrees clockwise
+
+  [nameEl, idNumberEl, dobEl, expiryEl].forEach((el) => {
+    el.addEventListener('input', updateSummary);
+  });
+
+  imageInput.addEventListener('change', () => {
+    if (imageInput.files[0]) setSelectedFile(imageInput.files[0]);
+  });
+
+  pasteZone.addEventListener('paste', (e) => {
+    const items = e.clipboardData && e.clipboardData.items ? e.clipboardData.items : [];
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) {
+          setSelectedFile(file);
+          statusEl.textContent = 'Image pasted. Click "Scan ID Card" to read it.';
+        }
+        e.preventDefault();
+        break;
+      }
+    }
+  });
+
+  document.addEventListener('paste', (e) => {
+    if (document.getElementById('scan-view').style.display === 'none') return;
+    if (document.activeElement === pasteZone) return;
+    const items = e.clipboardData && e.clipboardData.items ? e.clipboardData.items : [];
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) {
+          setSelectedFile(file);
+          statusEl.textContent = 'Image pasted. Click "Scan ID Card" to read it.';
+        }
+        break;
+      }
+    }
+  });
+
+  function setSelectedFile(file) {
+    selectedFile = file;
+    rotation = 0;
+    renderPreview();
+    rotateControls.style.display = 'flex';
+    clearFields();
+  }
+
+  rotateLeftBtn.addEventListener('click', () => {
+    rotation = (rotation + 270) % 360;
+    renderPreview();
+  });
+
+  rotateRightBtn.addEventListener('click', () => {
+    rotation = (rotation + 90) % 360;
+    renderPreview();
+  });
+
+  async function renderPreview() {
+    if (!selectedFile) return;
+    const canvas = await rotateImage(selectedFile, rotation);
+    preview.src = canvas.toDataURL('image/png');
+    preview.style.display = 'block';
+  }
+
+  function rotateImage(file, degrees) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const swap = degrees === 90 || degrees === 270;
+        canvas.width = swap ? img.height : img.width;
+        canvas.height = swap ? img.width : img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((degrees * Math.PI) / 180);
+        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+        resolve(canvas);
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  scanBtn.addEventListener('click', async () => {
+    if (!selectedFile) {
+      statusEl.textContent = 'Please choose or paste an image first.';
+      return;
+    }
+
+    scanBtn.disabled = true;
+    clearFields();
+    statusEl.textContent = 'Preparing image...';
+
+    try {
+      const processedCanvas = await preprocessImage(selectedFile, rotation);
+
+      statusEl.textContent = 'Reading image... 0%';
+
+      const { data } = await Tesseract.recognize(processedCanvas, 'eng', {
+        logger: (m) => {
+          if (m.status === 'recognizing text') {
+            statusEl.textContent = 'Reading image... ' + Math.round(m.progress * 100) + '%';
+          }
+        }
+      });
+
+      statusEl.textContent = 'Done. Please double check the fields below and correct anything that looks wrong.';
+      fillFields(parseIdText(data.text));
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = 'Something went wrong while scanning. Please try a clearer image.';
+    } finally {
+      scanBtn.disabled = false;
+    }
+  });
+
+  function clearFields() {
+    nameEl.value = '';
+    idNumberEl.value = '';
+    dobEl.value = '';
+    expiryEl.value = '';
+    summaryBox.value = '';
+  }
+
+  function fillFields(fields) {
+    nameEl.value = fields.name || '';
+    idNumberEl.value = fields.idNumber || '';
+    dobEl.value = fields.dob || '';
+    expiryEl.value = fields.expiry || '';
+    updateSummary();
+  }
+
+  function updateSummary() {
+    summaryBox.value =
+      'Name: ' + nameEl.value + '\n' +
+      'ID Number: ' + idNumberEl.value + '\n' +
+      'Date of Birth: ' + dobEl.value + '\n' +
+      'Expiry Date: ' + expiryEl.value;
+  }
+
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(summaryBox.value);
+    } catch (err) {
+      summaryBox.select();
+      document.execCommand('copy');
+    }
+    copyStatus.textContent = ' Copied!';
+    setTimeout(() => (copyStatus.textContent = ''), 2000);
+  });
+
+  function preprocessImage(file, degrees) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const swap = degrees === 90 || degrees === 270;
+        const baseW = swap ? img.height : img.width;
+        const baseH = swap ? img.width : img.height;
+
+        const scale = baseW < 1600 ? 2.5 : baseW < 2400 ? 1.5 : 1;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = baseW * scale;
+        canvas.height = baseH * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((degrees * Math.PI) / 180);
+        const drawW = img.width * scale;
+        const drawH = img.height * scale;
+        ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+
+        const contrast = 1.35;
+        const intercept = 128 * (1 - contrast);
+        for (let i = 0; i < data.length; i += 4) {
+          const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+          let v = gray * contrast + intercept;
+          v = Math.max(0, Math.min(255, v));
+          data[i] = data[i + 1] = data[i + 2] = v;
+        }
+        ctx.putImageData(imageData, 0, 0);
+        resolve(canvas);
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  function parseIdText(rawText) {
+    const text = rawText.replace(/\r/g, '');
+    const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+
+    const result = { name: null, idNumber: null, dob: null, expiry: null };
+
+    const idMatch = text.match(/78[47]\s?-?\s?\d{4}\s?-?\s?\d{7}\s?-?\s?\d/);
+    if (idMatch) {
+      result.idNumber = idMatch[0].replace(/\s/g, '').replace(/(\d{3})-?(\d{4})-?(\d{7})-?(\d)/, '$1-$2-$3-$4');
+    }
+
+    const dateRegex = /\b(\d{2}[\/\-]\d{2}[\/\-]\d{4})\b/g;
+    const allDates = [...text.matchAll(dateRegex)].map((m) => m[1]);
+
+    for (const line of lines) {
+      const lower = line.toLowerCase();
+      const dateInLine = line.match(dateRegex);
+      if (!dateInLine) continue;
+
+      if ((lower.includes('birth') || lower.includes('dob')) && !result.dob) {
+        result.dob = dateInLine[0];
+      } else if (lower.includes('expiry') && !result.expiry) {
+        result.expiry = dateInLine[0];
+      }
+    }
+
+    if ((!result.dob || !result.expiry) && allDates.length >= 2) {
+      const parsed = allDates
+        .map((d) => ({ raw: d, date: toDate(d) }))
+        .filter((d) => d.date)
+        .sort((a, b) => a.date - b.date);
+
+      if (parsed.length >= 2) {
+        if (!result.dob) result.dob = parsed[0].raw;
+        if (!result.expiry) result.expiry = parsed[parsed.length - 1].raw;
+      }
+    }
+
+    result.name = extractName(lines);
+
+    return result;
+  }
+
+  function extractName(lines) {
+    const labelSearch = /n[a4]\s*[rm][nm]?e\s*[:\/\-]?\s*/i;
+    const knownLabels = /card|emirates|identity|authority|federal|nationality|sex|gender|male|female|signature|occupation|employer|issuing|title|resident|date of birth|expiry/i;
+    const arabicChar = /[\u0600-\u06FF]/;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const match = line.match(labelSearch);
+      if (match && !knownLabels.test(line.slice(0, match.index))) {
+        let rest = line.slice(match.index + match[0].length);
+
+        const arabicIdx = rest.search(arabicChar);
+        if (arabicIdx !== -1) rest = rest.slice(0, arabicIdx);
+
+        const inlineValue = cleanName(rest);
+        if (inlineValue && inlineValue.length > 1) {
+          return inlineValue;
+        }
+
+        for (let j = i + 1; j < Math.min(i + 3, lines.length); j++) {
+          let candidateLine = lines[j];
+          const idx = candidateLine.search(arabicChar);
+          if (idx !== -1) candidateLine = candidateLine.slice(0, idx);
+          const candidate = cleanName(candidateLine);
+          if (candidate.length > 1 && !knownLabels.test(lines[j])) {
+            return candidate;
+          }
+        }
+      }
+    }
+
+    const candidates = lines
+      .map((l) => l.trim())
+      .filter((l) => /^[A-Z][A-Z\s.'-]{2,}$/.test(l) && !knownLabels.test(l));
+
+    if (candidates.length) {
+      candidates.sort((a, b) => b.length - a.length);
+      return cleanName(candidates[0]);
+    }
+
+    return null;
+  }
+
+  function cleanName(str) {
+    return str.replace(/[^A-Za-z\s.'-]/g, '').replace(/\s+/g, ' ').trim();
+  }
+
+  function toDate(ddmmyyyy) {
+    const parts = ddmmyyyy.split(/[\/\-]/);
+    if (parts.length !== 3) return null;
+    const dd = Number(parts[0]), mm = Number(parts[1]), yyyy = Number(parts[2]);
+    if (!dd || !mm || !yyyy) return null;
+    return new Date(yyyy, mm - 1, dd);
+  }
+
+  // ── In-page navigation (button click AND browser Back button both work) ──
+  const mainWrapper = document.getElementById('main-wrapper');
+  const scanView = document.getElementById('scan-view');
+  const openBtn = document.getElementById('open-scanner-btn');
+  const backBtn = document.getElementById('scan-back-btn');
+
+  function showScanner() {
+    mainWrapper.style.display = 'none';
+    scanView.style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function showMessageTool() {
+    scanView.style.display = 'none';
+    mainWrapper.style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  // Establish a known baseline state so the very first Back press
+  // after opening the scanner returns here instead of leaving the page.
+  history.replaceState({ view: 'main' }, '', location.pathname + location.search);
+
+  openBtn.addEventListener('click', () => {
+    history.pushState({ view: 'scanner' }, '', '#id-scanner');
+    showScanner();
+  });
+
+  // The in-page "Back" button behaves exactly like pressing the browser's
+  // own Back button.
+  backBtn.addEventListener('click', () => {
+    history.back();
+  });
+
+  window.addEventListener('popstate', (e) => {
+    if (e.state && e.state.view === 'scanner') {
+      showScanner();
+    } else {
+      showMessageTool();
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
