@@ -641,9 +641,9 @@ const MESSAGES = {
       }
       // Non-LMV or Final Road Test
       const messages = {
-        'Theory Test'         : 'Student has done the Mock test and waiting to get RTA Theory test payment clearance so that he can proceed with the RTA Theory test booking.',
-        'Yard / Parking Test' : 'Student has done Parking training, waiting to get RTA Parking/yard test payment clearance so that he can proceed with the RTA test booking.',
-        'Final Road Test'     : 'Student has done Parking training, waiting to get RTA Road test payment clearance so that he can proceed with the RTA test booking.',
+        'Theory Test'         : 'Student has done the Mock test and waiting to get *RTA Theory test payment clearance* so that he can proceed with the RTA Theory test booking.',
+        'Yard / Parking Test' : 'Student has done Parking training, waiting to get *RTA Parking/yard test payment clearance* so that he can proceed with the RTA test booking.',
+        'Final Road Test'     : 'Student has done mandatory training, waiting to get *RTA Road test payment clearance* so that he can proceed with the RTA test booking.',
       };
       const testMsg = messages[t] || 'is waiting to get Payment clearance.';
       return `Customer> ${n}\nEco ID : ${e}\nLP : ${l}\nCategory : ${c}\n${testMsg}`;
