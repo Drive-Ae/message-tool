@@ -678,6 +678,13 @@ const MESSAGES = {
       `Customer> ${n}\nEco ID : ${e}\nLP : ${l}\nCategory : ${c}\nPlease check, as in ECO system classes has been completed, but not reflecting in RTA. *Please update & Clear the Error to book the next test.*`
   },
 
+  "Auto to Manual Test": {
+    needsLP: false,
+    activeWhen: 'no-lp',
+    build: (n, e, l, c, t) =>
+      `Customer> ${n}\nEco ID : ${e}\nCategory : ${c}\nPlease book RTA Final test from Auto to Manual LMV,Need to call the customer before fixing the date, Please the classes requiremnt.`
+  },
+
   "Road Test Booking": {
     needsLP: true,
     activeWhen: 'has-lp',
